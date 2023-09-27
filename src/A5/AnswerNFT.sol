@@ -35,13 +35,8 @@ contract AnswerNFT is IAnswerNFT, Ownable {
         }
         // uint amount;
         for(uint i = 0; i < 5; i++){
-            // deal(msg.sender, 3 ether);
-            // payable(msg.sender).transfer(0.2 ether);
-            // nft.mintItem(msg.sender, _boosterCounter);
             address formerOwner = nft.ownerOf(_boosterCounter);
             nft.transferFrom(formerOwner, msg.sender, _boosterCounter);
-            // nft.approve(msg.sender, _boosterCounter);
-            // nft.mintItem(msg.sender); 
             _boosterCounter++;
         }
     }
