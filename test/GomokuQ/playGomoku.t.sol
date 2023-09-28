@@ -36,14 +36,28 @@ contract PlayGomoku is Test, IQuestionGomokuPlayersPerson{
         vm.prank(vars.bob.addr);
         _yourContract.play(1,1,0);
 
+        // for (uint i = 2; i < 8; i++){
+        //     vm.prank(vars.alice.addr);
+        //     _yourContract.play(1,uint8(16-i), uint8(i));
+            
+        //     vm.prank(vars.bob.addr);
+        //     _yourContract.play(1, uint8(i*2),0);
+        // }
+        // for (uint i = 2; i < 8; i++){
+        //     vm.prank(vars.alice.addr);
+        //     _yourContract.play(1,uint8(i), uint8(i));
+            
+        //     vm.prank(vars.bob.addr);
+        //     _yourContract.play(1, uint8(i*2),0);
+        // }
         for (uint i = 2; i < 8; i++){
             vm.prank(vars.alice.addr);
-            _yourContract.play(1,0, uint8(i));
+            _yourContract.play(1, 0, uint8(i));
             
             vm.prank(vars.bob.addr);
-            _yourContract.play(1, uint8(i),0);
+            _yourContract.play(1, uint8(i*2),0);
         }
-        vm.prank(vars.alice.addr);
+        vm.prank(vars.carl.addr);
         _yourContract.play(1,0, 6);
 
 
