@@ -31,9 +31,21 @@ contract PlayGomoku is Test, IQuestionGomokuPlayersPerson{
         assertEq(vars.bob.playGameId, 1);
         //start game
         vm.prank(vars.alice.addr);
-        _yourContract.play(1,0,0);
+        _yourContract.play(1,0,1);
         
         vm.prank(vars.bob.addr);
         _yourContract.play(1,1,0);
+
+        for (uint i = 2; i < 8; i++){
+            vm.prank(vars.alice.addr);
+            _yourContract.play(1,0, uint8(i));
+            
+            vm.prank(vars.bob.addr);
+            _yourContract.play(1, uint8(i),0);
+        }
+        vm.prank(vars.alice.addr);
+        _yourContract.play(1,0, 6);
+
+
     }
 }

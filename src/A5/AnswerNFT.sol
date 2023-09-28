@@ -21,7 +21,6 @@ contract AnswerNFT is IAnswerNFT, Ownable {
     }
 
     uint256 _boosterCounter = 1;
-    address public originHolder;
     /**
      * @dev NFTのガチャガチャを回す関数
      */
@@ -29,14 +28,13 @@ contract AnswerNFT is IAnswerNFT, Ownable {
         // Note: Fill me
         require(msg.value >= 1 ether, "Insufficient Ether to buy a booster pack");
         // payable(msg.sender).transfer(msg.sender); 
-        nft.setApprovalForAll(msg.sender, true);
-        if(_boosterCounter == 1){  //入場権利がある
-            originHolder = msg.sender;
-        }
+        // if(_boosterCounter == 1){  //入場権利がある
+        //     originHolder = msg.sender;
+        // }
         // uint amount;
         for(uint i = 0; i < 5; i++){
-            address formerOwner = nft.ownerOf(_boosterCounter);
-            nft.transferFrom(formerOwner, msg.sender, _boosterCounter);
+            // address formerOwner = nft.ownerOf(_boosterCounter);
+            nft.transferFrom(address(this), msg.sender, _boosterCounter);
             _boosterCounter++;
         }
     }
@@ -46,7 +44,7 @@ contract AnswerNFT is IAnswerNFT, Ownable {
      */
     function canEnterByOriginHolder() public override view returns (bool) {
         // Note: Fill me
-        require(msg.sender == originHolder,"You don't have the first NFT." );
+        require(msg.sender == nft.ownerOf(1) ,"You don't have the first NFT." );
         return true;
     }
 }

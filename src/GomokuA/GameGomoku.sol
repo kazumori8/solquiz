@@ -34,21 +34,30 @@ contract GameGomoku {
         return gameId;
     }
 
-    function play(uint gameId, uint8 row, uint8 col) public {
+    function play(uint gameId, uint8 row, uint8 col) public returns(string memory){
         Game storage game = games[gameId];
         require(game.state == GameState.Ongoing, "Game is not ongoing");
         require(game.board[row][col] == Player.None, "Cell is already occupied");
         require((msg.sender == game.host && game.currentPlayer == Player.Host) || 
                 (msg.sender == game.challenger && game.currentPlayer == Player.Challenger), "Not your turn");
-                
+        if(game.endGame){
+            if(msg.sender == game.winnerAddr){
+                return "You win!";
+            }else{
+                return "You lose!";
+            }
+        }
         game.board[row][col] = game.currentPlayer;
         
         if (_checkWin(game.board, row, col, game.currentPlayer)) {
             game.state = GameState.Finished;
-            return;
+            game.endGame = true;
+            game.winnerAddr = msg.sender;
+            return "You win!";
         }
         
         game.currentPlayer = (game.currentPlayer == Player.Host) ? Player.Challenger : Player.Host;
+        return "continue";
     }
 
     function _createEmptyBoard() internal pure returns (Player[15][15] memory) {
