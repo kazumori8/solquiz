@@ -4,15 +4,18 @@ pragma solidity ^0.8.17;
 import "forge-std/Test.sol";
 
 import { IQuestionGomokuPlayersPerson } from "./interfaces/IQuestionGomokuPlayersPerson.sol";
-import { GameGomoku } from "src/GomokuA/GameGomoku.sol";
+import { GomokuProxy } from "src/UpgradableGomokuA/GomokuProxy.sol";
 
+import { GomokuLogic } from "src/UpgradableGomokuA/GomokuLogic.sol";
 contract PlayGomoku is Test, IQuestionGomokuPlayersPerson{
-    GameGomoku _yourContract;
-    address _yourContractAddress;
-
+    GomokuProxy gomokuProxy;
+    address gomokuProxyAddress;
+    GomokuLogic gomokuLogic;
+    address gomokuLogicAddress;
     function setUp() public {
-        _yourContract = new GameGomoku();
-        _yourContractAddress = address(_yourContract);
+        gomokuLogic = new GomokuLogic();
+        gomokuProxy = new GomokuProxy(address(gomokuLogic)); // GomokuProxyをインスタンス化
+        gomokuProxyAddress = address(gomokuProxy);
     }
 
     function testGomokuPlayGomokuGomogomo() public {
@@ -21,45 +24,69 @@ contract PlayGomoku is Test, IQuestionGomokuPlayersPerson{
         vars.bob.addr = makeAddr("Bob");
         vars.carl.addr = makeAddr("Carl");
         
-        // create game
+   // create game
         vm.prank(vars.alice.addr);
-        vars.alice.playGameId = _yourContract.createGame();
+        vars.alice.playGameId = gomokuProxy.delegatecallCreateGame();
         assertEq(vars.alice.playGameId, 1);
-        //Join game
+
+
+
+        // Join game
         vm.prank(vars.bob.addr);
-        vars.bob.playGameId = _yourContract.joinGame(1);
+        vars.bob.playGameId = gomokuProxy.delegatecallJoinGame(1);
         assertEq(vars.bob.playGameId, 1);
-        //start game
+
+        // start game
         vm.prank(vars.alice.addr);
-        _yourContract.play(1,0,1);
+        gomokuProxy.delegatecallPlay(1, 0, 1);
         
         vm.prank(vars.bob.addr);
-        _yourContract.play(1,1,0);
+        gomokuProxy.delegatecallPlay(1, 1, 0);
 
-        // for (uint i = 2; i < 8; i++){
-        //     vm.prank(vars.alice.addr);
-        //     _yourContract.play(1,uint8(16-i), uint8(i));
-            
-        //     vm.prank(vars.bob.addr);
-        //     _yourContract.play(1, uint8(i*2),0);
-        // }
-        // for (uint i = 2; i < 8; i++){
-        //     vm.prank(vars.alice.addr);
-        //     _yourContract.play(1,uint8(i), uint8(i));
-            
-        //     vm.prank(vars.bob.addr);
-        //     _yourContract.play(1, uint8(i*2),0);
-        // }
         for (uint i = 2; i < 8; i++){
             vm.prank(vars.alice.addr);
-            _yourContract.play(1, 0, uint8(i));
+            gomokuProxy.delegatecallPlay(1,uint8(16-i), uint8(i));
             
             vm.prank(vars.bob.addr);
-            _yourContract.play(1, uint8(i*2),0);
+            gomokuProxy.delegatecallPlay(1, uint8(i*2),0);
         }
-        vm.prank(vars.carl.addr);
-        _yourContract.play(1,0, 6);
+        // for (uint i = 2; i < 8; i++){
+        //     vm.prank(vars.alice.addr);
+        //     gomokuProxy.play(1,uint8(i), uint8(i));
+            
+        //     vm.prank(vars.bob.addr);
+        //     gomokuProxy.play(1, uint8(i*2),0);
+        // }
+        // bool aliceFlg = false;
+        // for (uint i = 0; i <15; i+=2){
+        //     for (uint j = 0; j < 15; j++){
+        //         if(!aliceFlg){
+        //             vm.prank(vars.alice.addr);
+        //             gomokuProxy.play(1, uint8(i), uint8(j));
+        //         }else{
+        //             vm.prank(vars.bob.addr);
+        //             gomokuProxy.play(1, uint8(i), uint8(j));
+        //         }
+        //         aliceFlg = !aliceFlg;
+        //     }
+        // }
+        // for (uint i = 1; i <15; i+=2){
+        //     for (uint j = 0; j < 15; j++){
+        //         if(!aliceFlg){
+        //             vm.prank(vars.alice.addr);
+        //             gomokuProxy.play(1, uint8(i), uint8(j));
+        //         }else{
+        //             vm.prank(vars.bob.addr);
+        //             gomokuProxy.play(1, uint8(i), uint8(j));
+        //         }
+        //         aliceFlg = !aliceFlg;
+        //     }
+        // }
+        vm.prank(vars.alice.addr);
+        gomokuProxy.delegatecallPlay(1, 1, 0);
 
+        vm.prank(vars.carl.addr);
+        gomokuProxy.delegatecallPlay(1,0, 6);
 
     }
 }

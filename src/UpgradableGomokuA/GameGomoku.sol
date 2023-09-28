@@ -13,7 +13,6 @@ contract GameGomoku {
         Player[15][15] board;
         bool endGame;
         address winnerAddr;
-        string gameComment;
     }
 
     mapping(uint => Game) public games;
@@ -21,7 +20,7 @@ contract GameGomoku {
 
     function createGame() public returns (uint) {
         uint gameId = gameIdCounter++;
-        games[gameId] = Game(msg.sender, address(0), Player.Host, GameState.Open, _createEmptyBoard(), false, address(0),"");
+        games[gameId] = Game(msg.sender, address(0), Player.Host, GameState.Open, _createEmptyBoard(), false, address(0));
         return gameId;
     }
 

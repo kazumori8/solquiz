@@ -1,27 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-contract GameGomoku {
-    enum Player { None, Host, Challenger }
-    enum GameState { Open, Ongoing, Finished }
+import "./GomokuStorage.sol";
 
-    struct Game {
-        address host;
-        address challenger;
-        Player currentPlayer;
-        GameState state;
-        Player[15][15] board;
-        bool endGame;
-        address winnerAddr;
-        string gameComment;
-    }
-
-    mapping(uint => Game) public games;
-    uint public gameIdCounter = 1;
-
+contract GomokuLogic is GomokuStorage {
     function createGame() public returns (uint) {
         uint gameId = gameIdCounter++;
-        games[gameId] = Game(msg.sender, address(0), Player.Host, GameState.Open, _createEmptyBoard(), false, address(0),"");
+        games[gameId] = Game(msg.sender, address(0), Player.Host, GameState.Open, _createEmptyBoard(), false, address(0));
         return gameId;
     }
 
@@ -119,5 +104,25 @@ contract GameGomoku {
             if (count < 5) count = 1; // Reset count for the next direction.
         }
         return false;
+    }
+    function getOpenGames() public view returns(uint[] memory) {
+        uint count = 0;
+        // 開催中のゲーム数をカウント
+        for(uint i = 1; i <= gameIdCounter; i++) {
+            if(games[i].state == GameState.Open) {
+                count++;
+            }
+        }
+        
+        uint[] memory openGames = new uint[](count);
+        uint j = 0;
+        // 開催中のゲームIDを配列に追加
+        for(uint i = 1; i <= gameIdCounter; i++) {
+            if(games[i].state == GameState.Open) {
+                openGames[j] = i;
+                j++;
+            }
+        }
+        return openGames;
     }
 }
